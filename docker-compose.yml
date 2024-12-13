@@ -1,0 +1,10 @@
+services:
+  mongodb:
+    container_name: spring-batch-process
+    image: mongo:5.0.9
+    ports:
+      - '27017:27017'
+    volumes:
+      - dbdata:/data/db
+volumes:
+  dbdata:
