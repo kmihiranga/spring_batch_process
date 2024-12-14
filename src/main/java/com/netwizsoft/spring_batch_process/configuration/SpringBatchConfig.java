@@ -1,7 +1,9 @@
 package com.netwizsoft.spring_batch_process.configuration;
 
 import com.netwizsoft.spring_batch_process.domain.SpotifyTracks;
+import com.netwizsoft.spring_batch_process.domain.StudentDetails;
 import com.netwizsoft.spring_batch_process.repository.SpotifyTracksRepository;
+import com.netwizsoft.spring_batch_process.repository.StudentDetailsRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -26,32 +28,36 @@ import org.springframework.transaction.PlatformTransactionManager;
 @AllArgsConstructor
 public class SpringBatchConfig {
 
-    private final SpotifyTracksRepository spotifyTracksRepository;
+    private final StudentDetailsRepository studentDetailsRepository;
 
     @Bean
-    public FlatFileItemReader<SpotifyTracks> reader() {
-        return new FlatFileItemReaderBuilder<SpotifyTracks>()
+    public FlatFileItemReader<StudentDetails> reader() {
+        return new FlatFileItemReaderBuilder<StudentDetails>()
                 .name("spotifyTracksItemReader")
-                .resource(new ClassPathResource("spotify_tracks.csv"))
+                .resource(new ClassPathResource("student_depression_new.csv"))
                 .linesToSkip(1)
                 .lineMapper(lineMapper())
-                .targetType(SpotifyTracks.class)
+                .targetType(StudentDetails.class)
                 .build();
     }
 
-    private LineMapper<SpotifyTracks> lineMapper() {
-        DefaultLineMapper<SpotifyTracks> lineMapper = new DefaultLineMapper<>();
+    private LineMapper<StudentDetails> lineMapper() {
+        DefaultLineMapper<StudentDetails> lineMapper = new DefaultLineMapper<>();
 
         DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();
         lineTokenizer.setDelimiter(",");
         lineTokenizer.setStrict(false);
-        lineTokenizer.setNames("track_id", "track_name", "year", "popularity",
-                "artwork_url", "album_name", "danceability", "duration_ms", "energy",
-                "instrumentalness", "key", "liveness", "loudness", "speechiness", "tempo",
-                "time_signature", "valence", "track_url", "language");
+//        lineTokenizer.setNames("track_id", "track_name", "year", "popularity",
+//                "artwork_url", "album_name", "danceability", "duration_ms", "energy",
+//                "instrumentalness", "key", "liveness", "loudness", "speechiness", "tempo",
+//                "time_signature", "valence", "track_url", "language");
+        lineTokenizer.setNames("user_id", "gender", "age", "city", "profession", "academic_pressure",
+                "work_pressure", "cgpa", "study_satisfaction", "job_satisfaction", "sleep_duration",
+                "dietary_habits", "degree", "suicide_thoughts", "study_hours", "financial_stress",
+                "mental_illeness", "depression");
 
-        BeanWrapperFieldSetMapper<SpotifyTracks> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
-        fieldSetMapper.setTargetType(SpotifyTracks.class);
+        BeanWrapperFieldSetMapper<StudentDetails> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
+        fieldSetMapper.setTargetType(StudentDetails.class);
 
         lineMapper.setLineTokenizer(lineTokenizer);
         lineMapper.setFieldSetMapper(fieldSetMapper);
@@ -60,14 +66,14 @@ public class SpringBatchConfig {
     }
 
     @Bean
-    SpotifyTracksProcessor processor() {
-        return new SpotifyTracksProcessor();
+    StudentDetailsProcessor processor() {
+        return new StudentDetailsProcessor();
     }
 
     @Bean
-    RepositoryItemWriter<SpotifyTracks> writer() {
-        RepositoryItemWriter<SpotifyTracks> writer = new RepositoryItemWriter<>();
-        writer.setRepository(spotifyTracksRepository);
+    RepositoryItemWriter<StudentDetails> writer() {
+        RepositoryItemWriter<StudentDetails> writer = new RepositoryItemWriter<>();
+        writer.setRepository(studentDetailsRepository);
         writer.setMethodName("save");
 
         return writer;
@@ -83,7 +89,7 @@ public class SpringBatchConfig {
     @Bean
     public Step step(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
         return new StepBuilder("csv-import-step", jobRepository)
-                .<SpotifyTracks, SpotifyTracks>chunk(10, transactionManager)
+                .<StudentDetails, StudentDetails>chunk(10, transactionManager)
                 .reader(reader())
                 .processor(processor())
                 .writer(writer())
