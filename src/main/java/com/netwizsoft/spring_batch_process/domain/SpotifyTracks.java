@@ -1,10 +1,18 @@
 package com.netwizsoft.spring_batch_process.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "spotify_tracks")
+@Getter
+@Setter
 public class SpotifyTracks {
+
+    @Id
+    private String id;
 
     @JsonProperty("track_id")
     private String trackId;
@@ -12,12 +20,9 @@ public class SpotifyTracks {
     @JsonProperty("track_name")
     private String trackName;
 
-    @JsonProperty("artist_name")
-    private String artistName;
-
     private String year;
 
-    private int popularity;
+    private double popularity;
 
     @JsonProperty("artwork_url")
     private String artworkUrl;
@@ -25,31 +30,27 @@ public class SpotifyTracks {
     @JsonProperty("album_name")
     private String albumName;
 
-    private double acousticness;
-
     private double danceability;
 
     @JsonProperty("duration_ms")
-    private int durationMS;
+    private double durationMS;
 
     private double energy;
 
     private Double instrumentalness;
 
-    private int key;
+    private double key;
 
     private double liveness;
 
     private double loudness;
 
-    private int mode;
-
     private double speechiness;
 
     private double tempo;
 
-    @JsonProperty("time_sign")
-    private int timeSign;
+    @JsonProperty("time_signature")
+    private double timeSignature;
 
     private double valence;
 
